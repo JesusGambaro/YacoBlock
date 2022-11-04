@@ -5,7 +5,7 @@ namespace BlockchainBack.Services;
 
 public class BlockchainServices
 {
-    public Blockchain Blockchain { get; }
+    public Blockchain Blockchain { get; set; }
     public object? Program { get; private set; }
     private readonly MongoDbRepository _mongoDbRepository = new MongoDbRepository();
 
@@ -47,7 +47,7 @@ public class BlockchainServices
 
     public void AddTransaction(Transaction transaction)
     {
-        Console.WriteLine("ASDASD=> "+Blockchain.Id);
+        Console.WriteLine("ASDASD=> " + Blockchain.Id);
         _mongoDbRepository.CreateTransactionInBlockchain(transaction, Blockchain);
         Blockchain.PendingTransactions.Add(transaction);
     }
@@ -59,7 +59,7 @@ public class BlockchainServices
         // add mining reward transaction to block
         //Transaction trans = new Transaction("SYSTEM", miningRewardAddress, blockchain.MiningReward, "Mining reward");
         //blockchain.PendingTransactions.Add(trans);
-        await _mongoDbRepository.UpdateBlockchain(Blockchain);
+        Blockchain = await _mongoDbRepository.UpdateBlockchain();
         var block = new Block(DateTime.Now, Blockchain.PendingTransactions, LatestBlock().Hash);
         var blockServices = new BlockServices(block);
         blockServices.MineBlock(Blockchain.Difficulty);
@@ -114,7 +114,6 @@ public class BlockchainServices
 
     public void DeleteTransaction(string id)
     {
-        
         _mongoDbRepository.DeleteTransaction(id, Blockchain);
         Blockchain.PendingTransactions.RemoveAll(transaction => transaction.Id == id);
     }

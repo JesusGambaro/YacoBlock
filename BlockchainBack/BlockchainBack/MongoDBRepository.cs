@@ -83,24 +83,27 @@ public class MongoDbRepository
         return blockchain;
     }
 
-    public async Task<Blockchain> UpdateBlockchain(Blockchain blockchain)
+    public async Task<Blockchain> UpdateBlockchain()
     {
-        //Update the blockchain, blocks and transactions in the database
+        //Get the blockchain, blocks and transactions from the database
         var collection = _user1.GetCollection<Blockchain>("blockchain");
         var collection2 = _user1.GetCollection<Block>("block");
         var collection3 = _user1.GetCollection<Transaction>("transaction");
 
-        var filter = Builders<Blockchain>.Filter.Eq("Id", blockchain.Id);
-        var update = Builders<Blockchain>.Update.Set("Chain", blockchain.Chain);
-        await collection.UpdateOneAsync(filter, update);
+        var blockchain = await collection.Find(_ => true).FirstOrDefaultAsync();
+        //Get blocks by matching blockchain id and matching block id with each block in the blockchain
+        var blocks = await collection2.Find(b => b.BlockchainId == blockchain.Id).ToListAsync();
+        blockchain.Chain = blocks;
+        //Get transactions by matching block id and matching transaction id with each transaction in the block
+        foreach (var block in blockchain.Chain)
+        {
+            var transactions = await collection3.Find(t => t.BlockId == block.Id).ToListAsync();
+            block.Transactions = transactions;
+        }
 
-        var filter2 = Builders<Block>.Filter.Eq("BlockchainId", blockchain.Id);
-        var update2 = Builders<Block>.Update.Set("Transactions", blockchain.Chain.SelectMany(b => b.Transactions));
-        await collection2.UpdateManyAsync(filter2, update2);
-
-        var filter3 = Builders<Transaction>.Filter.Eq("BlockchainId", blockchain.Id);
-        var update3 = Builders<Transaction>.Update.Set("BlockchainId", blockchain.Id);
-        await collection3.UpdateManyAsync(filter3, update3);
+        //get pending transactions by matching blockchain id
+        var pendingTransactions = await collection3.Find(t => t.BlockchainId == blockchain.Id).ToListAsync();
+        blockchain.PendingTransactions = pendingTransactions;
         return blockchain;
     }
 
@@ -237,10 +240,8 @@ public class MongoDbRepository
         var filter = Builders<Blockchain>.Filter.Eq("Id", blockchain.Id);
 
         var update = Builders<Blockchain>.Update.Pull("PendingTransactions", tr);
-        
+
         bcCollection.UpdateOne(filter, update);
         trCollection.DeleteOne(t => t.Id == id);
     }
-    
-  
 }
