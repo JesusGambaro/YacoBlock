@@ -17,11 +17,11 @@ namespace BlockchainBack.Controllers
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(" Obteniendo la Blockchain.");
 
-            var blockChain = Program._blockchainServices.Blockchain;
-
+            var blockChain = Program.GetBlockchain();
+            blockChain.Wait();
             Console.ResetColor();
 
-            return blockChain;
+            return blockChain.Result;
         }
 
         [HttpPost("mine", Name = "Mine")]

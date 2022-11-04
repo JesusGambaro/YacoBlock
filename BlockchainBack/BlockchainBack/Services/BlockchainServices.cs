@@ -59,6 +59,7 @@ public class BlockchainServices
         // add mining reward transaction to block
         //Transaction trans = new Transaction("SYSTEM", miningRewardAddress, blockchain.MiningReward, "Mining reward");
         //blockchain.PendingTransactions.Add(trans);
+        await _mongoDbRepository.UpdateBlockchain(Blockchain);
         var block = new Block(DateTime.Now, Blockchain.PendingTransactions, LatestBlock().Hash);
         var blockServices = new BlockServices(block);
         blockServices.MineBlock(Blockchain.Difficulty);

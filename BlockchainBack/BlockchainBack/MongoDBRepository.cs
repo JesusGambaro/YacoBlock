@@ -83,7 +83,7 @@ public class MongoDbRepository
         return blockchain;
     }
 
-    public async Task UpdateBlockchain(Blockchain blockchain)
+    public async Task<Blockchain> UpdateBlockchain(Blockchain blockchain)
     {
         //Update the blockchain, blocks and transactions in the database
         var collection = _user1.GetCollection<Blockchain>("blockchain");
@@ -101,6 +101,7 @@ public class MongoDbRepository
         var filter3 = Builders<Transaction>.Filter.Eq("BlockchainId", blockchain.Id);
         var update3 = Builders<Transaction>.Update.Set("BlockchainId", blockchain.Id);
         await collection3.UpdateManyAsync(filter3, update3);
+        return blockchain;
     }
 
     private async Task UpdateBlock(Block block)
@@ -240,4 +241,6 @@ public class MongoDbRepository
         bcCollection.UpdateOne(filter, update);
         trCollection.DeleteOne(t => t.Id == id);
     }
+    
+  
 }

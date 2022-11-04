@@ -1,4 +1,5 @@
-﻿using BlockchainBack.Models;
+﻿using System.Reflection;
+using BlockchainBack.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
@@ -20,7 +21,9 @@ namespace BlockchainBack.Controllers
             Console.WriteLine("");
             Console.WriteLine($"Notificacion de la API: Transactions-add {newTransaction.Id} ");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            var foundTransaction = Program._blockchainServices.PendingTransactions()
+            var blockchain = Program.GetBlockchain();
+            blockchain.Wait();
+            var foundTransaction = blockchain.Result.PendingTransactions
                 .FirstOrDefault(pt => pt.Id == newTransaction.Id);
 
             if (foundTransaction == null)
@@ -49,6 +52,7 @@ namespace BlockchainBack.Controllers
             Console.WriteLine("");
             Console.WriteLine("Notificacion de la API: Transactions-get");
             Console.ForegroundColor = ConsoleColor.Cyan;
+            
             var pendingTransactions = Program._blockchainServices.PendingTransactions();
             Console.WriteLine($"Se han encontrado {pendingTransactions.Count} transacciones pendientes.");
             Console.ResetColor();
