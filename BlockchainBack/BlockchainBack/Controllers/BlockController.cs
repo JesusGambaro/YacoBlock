@@ -16,7 +16,7 @@ public class BlockController : Controller
         Console.WriteLine("");
         Console.WriteLine("Notificacion de la API: GetBalance");
         Console.ForegroundColor = ConsoleColor.Cyan;
-        var balance = Program._blockchainServices.Balance(address);
+        var balance = Program._blockchainServices.GetBalance(address);
         Console.WriteLine($"Balance de {address} es: {balance}.");
         Console.ResetColor();
         return Ok(balance);

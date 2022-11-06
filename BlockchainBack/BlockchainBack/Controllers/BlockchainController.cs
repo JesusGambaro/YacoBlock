@@ -16,7 +16,7 @@ namespace BlockchainBack.Controllers
             Console.WriteLine($"Notificacion de la API: GetBlockchain() ");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(" Obteniendo la Blockchain.");
-            
+
             var blockChain = Program.GetBlockchain();
             blockChain.Wait();
             Console.ResetColor();
@@ -53,6 +53,20 @@ namespace BlockchainBack.Controllers
 
             new MongoDbRepository().DeleteAll();
             Console.ResetColor();
+        }
+
+        [HttpGet]
+        [Route("GetTotales")]
+        public IActionResult GetTotales()
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("");
+            Console.WriteLine($"Notificacion de la API: GetTotales() ");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(" Obteniendo los totales de la Blockchain");
+            Console.ResetColor();
+
+            return Ok(Program._blockchainServices.GetTotales());
         }
     }
 }

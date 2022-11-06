@@ -16,7 +16,6 @@ public class Transaction
     public decimal Amount { get; set; }
     //public string Description { get; set; }
     
-    
     public ObjectId BlockId { get; set; }
     
     public ObjectId BlockchainId { get; set; }

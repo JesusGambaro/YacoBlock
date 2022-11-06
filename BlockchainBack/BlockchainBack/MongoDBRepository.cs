@@ -1,4 +1,5 @@
-﻿using BlockchainBack.Models;
+﻿using BlockchainBack.Controllers;
+using BlockchainBack.Models;
 using BlockchainBack.Services;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -76,7 +77,7 @@ public class MongoDbRepository
             //get pending transactions by matching blockchain id
             var pendingTransactions = await collection3.Find(t => t.BlockchainId == blockchain.Id).ToListAsync();
             blockchain.PendingTransactions = pendingTransactions;
-            blocks.ForEach(bk => Console.WriteLine(bk.Hash));
+            //blocks.ForEach(bk => Console.WriteLine(bk.Hash));
             Console.ResetColor();
         }
 
@@ -109,10 +110,6 @@ public class MongoDbRepository
 
     private async Task UpdateBlock(Block block)
     {
-        //Update the block in the database
-        //Console.WriteLine("-------");
-        //block.Transactions.ForEach(pt=>Console.WriteLine(pt.Description));
-
         var collection = _user1.GetCollection<Block>("block");
         var filter = Builders<Block>.Filter.Eq("Hash", block.Hash);
         var update = Builders<Block>.Update.Set("Transactions", block.Transactions);
@@ -243,5 +240,44 @@ public class MongoDbRepository
 
         bcCollection.UpdateOne(filter, update);
         trCollection.DeleteOne(t => t.Id == id);
+    }
+
+    public int GetChainLength()
+    {
+        //Get the length of the chain
+        var collection = _user1.GetCollection<Blockchain>("blockchain");
+        var chain = collection.Find(new BsonDocument()).FirstOrDefault();
+        return chain.Chain.Count;
+    }
+
+    public Task<List<LibroMayor>> GetTransactionsMapped(BlockchainServices blockchainServices)
+    {
+        var bkCollection = _user1.GetCollection<Block>("block");
+
+        var bk = bkCollection.Find(_ => true).ToList();
+        //save all transactions of all blocks in a list
+        var transactions = bk.SelectMany(block => block.Transactions).ToList();
+        var librosMayores = new List<LibroMayor>();
+        //unique list of senders and receivers
+        var senders = transactions.Select(t => t.Sender.Address).Distinct().ToList();
+        var receivers = transactions.Select(t => t.Receiver.Address).Distinct().ToList();
+        //list of unique senders and receivers
+        var uniqueSenders = receivers.Union(senders).ToList();
+        //create a list of LibroMayor with the unique senders and receivers
+        foreach (var den in uniqueSenders)
+        {
+            var libro = new LibroMayor();
+            var senderTransactions = transactions.Where(t => t.Sender.Address == den).ToList();
+            var receiverTransactions = transactions.Where(t => t.Receiver.Address == den).ToList();
+            libro.Cuenta = den;
+            libro.Debe = senderTransactions.Sum(t => t.Amount);
+            libro.DebeList = senderTransactions.Select(t => t.Amount).ToList();
+            libro.Haber = receiverTransactions.Sum(t => t.Amount);
+            libro.HaberList = receiverTransactions.Select(t => t.Amount).ToList();
+            libro.Saldo = blockchainServices.GetBalance(den);
+            librosMayores.Add(libro);
+        }
+
+        return Task.FromResult(librosMayores);
     }
 }

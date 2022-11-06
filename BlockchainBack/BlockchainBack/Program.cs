@@ -1,3 +1,4 @@
+using BlockchainBack.Controllers;
 using BlockchainBack.Models;
 using BlockchainBack.Services;
 
@@ -29,5 +30,11 @@ public static class Program
     {
         var blockchain = await mongoDbRepository.UpdateBlockchain();
         return blockchain;
+    }
+
+    public static async Task<List<LibroMayor>> GetLibrosMayores(BlockchainServices blockchainServices)
+    {
+        var libroMayor = await mongoDbRepository.GetTransactionsMapped(blockchainServices);
+        return libroMayor;
     }
 }

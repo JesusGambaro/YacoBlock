@@ -14,12 +14,9 @@ namespace BlockchainBack.Controllers
         [Route("AddTransaction"), Produces("application/json")]
         public IActionResult AddTransaction([FromBody] Transaction newTransaction)
         {
-            Console.WriteLine("AddTransaction");
-            Console.WriteLine(newTransaction.Sender.Address);
-            Console.WriteLine(newTransaction.Receiver.Address);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("");
-            Console.WriteLine($"Notificacion de la API: Transactions-add {newTransaction.Id} ");
+            Console.WriteLine($"Notificacion de la API: Transactions-add {newTransaction.Id} from {newTransaction.Sender.Address} to {newTransaction.Receiver.Address} \n with {newTransaction.Amount} pesos");
             Console.ForegroundColor = ConsoleColor.Cyan;
             var blockchain = Program.GetBlockchain();
             blockchain.Wait();
@@ -52,7 +49,7 @@ namespace BlockchainBack.Controllers
             Console.WriteLine("");
             Console.WriteLine("Notificacion de la API: Transactions-get");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            
+
             var pendingTransactions = Program._blockchainServices.PendingTransactions();
             Console.WriteLine($"Se han encontrado {pendingTransactions.Count} transacciones pendientes.");
             Console.ResetColor();
@@ -69,7 +66,6 @@ namespace BlockchainBack.Controllers
             Console.WriteLine("Notificacion de la API: Transactions-delete");
             Console.ForegroundColor = ConsoleColor.Cyan;
             var pendingTransactions = Program._blockchainServices.PendingTransactions();
-            Console.WriteLine("Condicion=> " + pendingTransactions.All(tr => tr.Id != id) + " id=> " + id);
             if (pendingTransactions.All(tr => tr.Id != id))
             {
                 Console.WriteLine("No se ha encontrado la transaccion.");
@@ -82,6 +78,22 @@ namespace BlockchainBack.Controllers
             Console.WriteLine("Transaccion eliminada");
             Console.ResetColor();
             return Ok(pendingTransactions);
+        }
+
+        [HttpGet]
+        [Route("GetLibrosMayores"), Produces("application/json")]
+        public IActionResult GetTransactions()
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("");
+            Console.WriteLine("Notificacion de la API: Transactions-get");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            var librosMayores = Program.GetLibrosMayores(Program._blockchainServices);
+            librosMayores.Wait();
+            Console.WriteLine($"Se han encontrado {librosMayores.Result.Count} transacciones.");
+            Console.ResetColor();
+            return Ok(librosMayores.Result);
         }
     }
 }

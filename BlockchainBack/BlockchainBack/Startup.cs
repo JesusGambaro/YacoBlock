@@ -23,9 +23,10 @@ public class Startup
                         .AllowAnyMethod();
                 });
         });
+
         var app = builder.Build();
-        app.UseAuthentication();
-// Configure the HTTP request pipeline.
+
+        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -34,7 +35,7 @@ public class Startup
 
         app.UseCors(_ => _.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-
+        app.UseMiddleware<UpdateMiddleware>();
         app.UseHttpsRedirection();
 
         app.MapControllers();

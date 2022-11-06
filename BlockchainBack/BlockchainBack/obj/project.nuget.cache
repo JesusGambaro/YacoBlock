@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KZ1TfxpG5Iu13t5Bh+vkBkAAyFctXD9kimXpoya//SHltTDzq1SGdA9aKNC8/ESeYpv0Wg/RC5YgrOoCYlLRzQ==",
+  "dgSpecHash": "HLti8Dm8yv/RTy4i7pz0B6UXKIFWPdm8X8OFE239G+5yO2A0ThjnVEl8mtzkYNC9232yCb7pZwyKocLJaFXjLg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Administrator\\Desktop\\BlockchainBack\\BlockchainBack\\BlockchainBack.csproj",
+  "projectFilePath": "C:\\Users\\Administrator\\Desktop\\YacoBlock\\BlockchainBack\\BlockchainBack\\BlockchainBack.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\dnsclient\\1.6.1\\dnsclient.1.6.1.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.aspnet.cors\\5.2.9\\microsoft.aspnet.cors.5.2.9.nupkg.sha512",

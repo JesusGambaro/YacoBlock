@@ -7,7 +7,7 @@ public class BlockchainServices
 {
     public Blockchain Blockchain { get; set; }
     public object? Program { get; private set; }
-    private readonly MongoDbRepository _mongoDbRepository = new MongoDbRepository();
+    private readonly MongoDbRepository _mongoDbRepository = new();
 
     public BlockchainServices(Blockchain blockchain)
     {
@@ -47,7 +47,6 @@ public class BlockchainServices
 
     public void AddTransaction(Transaction transaction)
     {
-        Console.WriteLine("ASDASD=> " + Blockchain.Id);
         _mongoDbRepository.CreateTransactionInBlockchain(transaction, Blockchain);
         Blockchain.PendingTransactions.Add(transaction);
     }
@@ -72,7 +71,7 @@ public class BlockchainServices
 
     public bool IsBlockchainValid()
     {
-        for (long i = 1; i < Blockchain.Chain.Count(); i++)
+        for (long i = 1; i < Blockchain.Chain.Count; i++)
         {
             var currentBlock = Blockchain.Chain[(int)i];
             var previousBlock = Blockchain.Chain[(int)i - 1];
@@ -92,20 +91,66 @@ public class BlockchainServices
         return true;
     }
 
-    public decimal Balance(string address)
+    public decimal GetBalance(string address)
     {
         decimal balance = 0;
 
         foreach (var transaction in Blockchain.Chain.SelectMany(block => block.Transactions))
         {
+            if (transaction.Sender.Tipo == "pasivo" && transaction.Receiver.Tipo == "activo")
+            {
+                if (transaction.Sender.Address == address)
+                {
+                    balance -= transaction.Amount;
+                }
+
+                if (transaction.Receiver.Address == address)
+                {
+                    balance -= transaction.Amount;
+                }
+
+                continue;
+            }
+
+            if (transaction.Sender.Tipo == "activo" && transaction.Receiver.Tipo == "pasivo" ||
+                transaction.Sender.Tipo == "activo" && transaction.Receiver.Tipo == "resultado positivo")
+            {
+                if (transaction.Sender.Address == address)
+                {
+                    balance += transaction.Amount;
+                }
+
+                if (transaction.Receiver.Address == address)
+                {
+                    balance += transaction.Amount;
+                }
+
+                continue;
+            }
+
+            if (transaction.Sender.Tipo == "resultado negativo" && transaction.Receiver.Tipo == "activo")
+            {
+                if (transaction.Sender.Address == address)
+                {
+                    balance += transaction.Amount;
+                }
+
+                if (transaction.Receiver.Address == address)
+                {
+                    balance -= transaction.Amount;
+                }
+
+                continue;
+            }
+
             if (transaction.Sender.Address == address)
             {
-                balance -= transaction.Amount;
+                balance += transaction.Amount;
             }
 
             if (transaction.Receiver.Address == address)
             {
-                balance += transaction.Amount;
+                balance -= transaction.Amount;
             }
         }
 
@@ -116,5 +161,27 @@ public class BlockchainServices
     {
         _mongoDbRepository.DeleteTransaction(id, Blockchain);
         Blockchain.PendingTransactions.RemoveAll(transaction => transaction.Id == id);
+    }
+
+    public List<decimal> GetTotales()
+    {
+        var totales = new List<decimal>();
+        decimal haber = 0, debe = 0;
+        foreach (var transaction in Blockchain.Chain.Select(block => block.Transactions)
+                     .SelectMany(transactions => transactions))
+        {
+            haber += transaction.Receiver.Tipo == "activo" || transaction.Receiver.Tipo == "pasivo" ||
+                     transaction.Receiver.Tipo == "resultado positivo"
+                ? transaction.Amount
+                : 0;
+            debe += transaction.Sender.Tipo == "activo" || transaction.Sender.Tipo == "pasivo" ||
+                    transaction.Sender.Tipo == "resultado negativo"
+                ? transaction.Amount
+                : 0;
+        }
+        totales.Add(debe);
+        totales.Add(haber);
+
+        return totales;
     }
 }
