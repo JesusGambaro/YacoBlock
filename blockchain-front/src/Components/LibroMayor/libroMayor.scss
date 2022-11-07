@@ -1,0 +1,105 @@
+@media (max-width: 1280px) {
+  .libro-mayor-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .libro-mayor-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.libro-mayor-container {
+  display: grid;
+
+  width: 90%;
+  justify-content: space-between;
+  .t-container {
+    border: 0.1rem solid #000;
+    border-radius: 0.5rem;
+    margin: 10px;
+    position: relative;
+
+    .t-header {
+      border-bottom: 0.1rem solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      height: 6rem;
+      width: 100%;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #000000;
+      padding: 0.5rem 0;
+      position: relative;
+
+      h1 {
+        width: 50%;
+        text-align: center;
+        z-index: 1;
+        align-items: center;
+        justify-content: center;
+      }
+      p {
+        align-self: flex-end;
+      }
+    }
+    .t-body {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      height: calc(100% - 6rem);
+      .count-wrapper {
+        padding: 1rem 1rem 0;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        height: 100%;
+        &::before {
+          content: '';
+          position: absolute;
+          display: block;
+          clear: both;
+          height: calc(100% + 1rem);
+          background: #000;
+          width: 0.1rem;
+          top: 0rem;
+          left: 50%;
+          transform: translate(-50%, 0);
+        }
+        ul {
+          list-style: none;
+          height: 100%;
+          padding: 1ren;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 1rem;
+
+          h2 {
+            font-size: 1rem;
+            font-weight: 500;
+          }
+        }
+        .haber-list {
+          align-items: flex-end;
+        }
+        .debe-list {
+        }
+      }
+    }
+    .t-footer {
+      display: flex;
+      align-items: center;
+      height: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      justify-self: end;
+      border-top: 0.1rem solid #000;
+      h2 {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+    }
+  }
+}

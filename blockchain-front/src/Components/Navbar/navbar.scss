@@ -1,0 +1,78 @@
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  height: 4rem;
+  padding: 1rem;
+  margin: 0;
+  background: #fff;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  .logo {
+    display: flex;
+    gap: 0.5rem;
+    .logo-img {
+      height: 100%;
+      animation: spin 3s linear infinite alternate;
+      transition: all 0.2s;
+    }
+    .logo-name {
+      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #008000;
+      transition: all 0.2s;
+      &::after {
+        content: '_';
+        color: #008000;
+        animation: blink 0.5s alternate infinite;
+      }
+      @keyframes blink {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .nav-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    margin-right: 3rem;
+  }
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+  }
+  .navLink {
+    cursor: pointer;
+    padding: 0px 20px;
+    margin: 0;
+    color: black;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: 'Inder', sans-serif;
+    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition-duration: 400ms;
+    transition-property: width, left;
+    position: relative;
+
+    &:hover {
+      color: #008000;
+      filter: brightness(1.2);
+    }
+  }
+}
