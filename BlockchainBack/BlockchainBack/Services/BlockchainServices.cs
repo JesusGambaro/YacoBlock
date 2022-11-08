@@ -167,7 +167,11 @@ public class BlockchainServices
     {
         var totales = new List<decimal>();
         decimal haber = 0, debe = 0;
-        foreach (var transaction in Blockchain.Chain.Select(block => block.Transactions)
+        
+        var blockchain = BlockchainBack.Program.GetBlockchain();
+        blockchain.Wait();
+        
+        foreach (var transaction in blockchain.Result.Chain.Select(block => block.Transactions)
                      .SelectMany(transactions => transactions))
         {
             haber += transaction.Receiver.Tipo == "activo" || transaction.Receiver.Tipo == "pasivo" ||

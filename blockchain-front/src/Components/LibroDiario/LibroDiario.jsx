@@ -57,17 +57,21 @@ const LibroDiario = () => {
         setPendingTransactions(res.data.pendingTransactions);
       })
       .finally(() => {
-        setLoading(false);
+        
         calculateTotales();
       });
   }, []);
 
   const calculateTotales = () => {
     axios.get("https://localhost:9000/Blockchain/GetTotales").then((res) => {
+      console.log("Totales");
+      console.log(res);
       setTotalesLibroDiario({
         haberes: res.data[0],
         deudores: res.data[1],
       });
+    }).finally(() => {
+      setLoading(false);
     });
   };
   const parseDate = (date) => {
@@ -247,10 +251,10 @@ const LibroDiario = () => {
     axios
       .delete("https://localhost:9000/Blockchain")
       .then((res) => {
-        console.log(res);
+        //console.log(res);
       })
       .catch((res) => {
-        console.log(res);
+        //console.log(res);
       })
       .finally(() => {
         axios
@@ -260,7 +264,7 @@ const LibroDiario = () => {
             setPendingTransactions(res.data.pendingTransactions);
           })
           .finally(() => {
-            setLoading(false);
+        
             calculateTotales();
           });
       });
