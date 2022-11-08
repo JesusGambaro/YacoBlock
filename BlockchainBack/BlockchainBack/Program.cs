@@ -28,7 +28,7 @@ public static class Program
 
     public static async Task<Blockchain> GetBlockchain()
     {
-        var blockchain = await mongoDbRepository.UpdateBlockchain();
+        var blockchain = await mongoDbRepository.GetBlockchain();
         return blockchain;
     }
 

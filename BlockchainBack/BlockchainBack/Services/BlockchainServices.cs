@@ -47,7 +47,7 @@ public class BlockchainServices
 
     public void AddTransaction(Transaction transaction)
     {
-        _mongoDbRepository.CreateTransactionInBlockchain(transaction, Blockchain);
+        _mongoDbRepository.CreateTransactionInBlockchain(transaction);
         Blockchain.PendingTransactions.Add(transaction);
     }
 

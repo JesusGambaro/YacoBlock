@@ -19,6 +19,26 @@ main {
   //Custom table
   header {
     margin: 2rem 0;
+    position: relative;
+    button{
+      right: -150%;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+      cursor: pointer;
+        font-weight: 700;
+        transition: all 0.2s;
+        padding: 10px 20px;
+        border-radius: 100px;
+        background: #ef0000;
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+        &:hover {
+          background: #cc0808;
+        }
+    }
   }
   .libro-table {
     width: 90%;

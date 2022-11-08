@@ -1,250 +1,285 @@
-import { useState, useEffect } from 'react'
-import './libroDiario.scss'
-import axios from 'axios'
-import Transactions from './Transactions'
-import Amount from './Amount'
-import Loader from '../Loader/Loader'
+import { useState, useEffect } from "react";
+import "./libroDiario.scss";
+import axios from "axios";
+import Transactions from "./Transactions";
+import Amount from "./Amount";
+import Loader from "../Loader/Loader";
+import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
 const TRANSACTION_MODEL = {
   sender: {
-    address: '',
-    tipo: 'activo',
+    address: "",
+    tipo: "activo",
   },
   receiver: {
-    address: '',
-    tipo: 'pasivo',
+    address: "",
+    tipo: "pasivo",
   },
   amount: 0,
-}
+};
 const LibroDiario = () => {
-  const [libroDiario, setLibroDiario] = useState([])
-  const [pendingTransactions, setPendingTransactions] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [libroDiario, setLibroDiario] = useState([]);
+  const [pendingTransactions, setPendingTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [dialogActive, setDialogActive] = useState(false);
   const [totalesLibroDiario, setTotalesLibroDiario] = useState({
     haberes: 0,
     deudores: 0,
-  })
+  });
 
   const [error, setError] = useState({
     sender: {
-      address: '',
-      tipo: '',
+      address: "",
+      tipo: "",
     },
     receiver: {
-      address: '',
-      tipo: '',
+      address: "",
+      tipo: "",
     },
-    amount: '',
-  })
+    amount: "",
+  });
   const [newTransaction, setNewTransaction] = useState({
     sender: {
-      address: '',
-      tipo: 'activo',
+      address: "",
+      tipo: "activo",
     },
     receiver: {
-      address: '',
-      tipo: 'pasivo',
+      address: "",
+      tipo: "pasivo",
     },
     amount: 0,
-  })
+  });
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     axios
-      .get('https://localhost:9000/Blockchain')
+      .get("https://localhost:9000/Blockchain")
       .then((res) => {
-        setLibroDiario(res.data.chain)
-        setPendingTransactions(res.data.pendingTransactions)
+        setLibroDiario(res.data.chain);
+        setPendingTransactions(res.data.pendingTransactions);
       })
       .finally(() => {
-        setLoading(false)
-        calculateTotales()
-      })
-  }, [])
+        setLoading(false);
+        calculateTotales();
+      });
+  }, []);
 
   const calculateTotales = () => {
-    axios.get('https://localhost:9000/Blockchain/GetTotales').then((res) => {
+    axios.get("https://localhost:9000/Blockchain/GetTotales").then((res) => {
       setTotalesLibroDiario({
         haberes: res.data[0],
         deudores: res.data[1],
-      })
-    })
-  }
+      });
+    });
+  };
   const parseDate = (date) => {
-    const d = new Date(date)
+    const d = new Date(date);
     return `${
       d.getDate().toString().length == 1
-        ? '0' + d.getDate().toString()
+        ? "0" + d.getDate().toString()
         : d.getDate()
-    }/${d.getMonth() + 1}/${d.getFullYear()}`
-  }
+    }/${d.getMonth() + 1}/${d.getFullYear()}`;
+  };
 
   const verifyErrors = () => {
-    let hasErrors = false
-    let newError = error
+    let hasErrors = false;
+    let newError = error;
     if (
       !newTransaction.sender.address.length ||
-      newTransaction.sender.address == ''
+      newTransaction.sender.address == ""
     ) {
-      hasErrors = true
+      hasErrors = true;
       newError = {
         ...newError,
-        sender: { ...newError.sender, address: 'Este campo es requerido.' },
-      }
+        sender: { ...newError.sender, address: "Este campo es requerido." },
+      };
     } else {
       newError = {
         ...newError,
-        sender: { ...newError.sender, address: '' },
-      }
+        sender: { ...newError.sender, address: "" },
+      };
     }
     if (
       !newTransaction.sender.tipo.length ||
-      newTransaction.sender.tipo == ''
+      newTransaction.sender.tipo == ""
     ) {
-      hasErrors = true
+      hasErrors = true;
       newError = {
         ...newError,
-        sender: { ...newError.sender, tipo: 'Este campo es requerido.' },
-      }
+        sender: { ...newError.sender, tipo: "Este campo es requerido." },
+      };
     } else {
       newError = {
         ...newError,
-        sender: { ...newError.sender, tipo: '' },
-      }
+        sender: { ...newError.sender, tipo: "" },
+      };
     }
     if (
       !newTransaction.receiver.address.length ||
-      newTransaction.receiver.address == ''
+      newTransaction.receiver.address == ""
     ) {
-      hasErrors = true
+      hasErrors = true;
       newError = {
         ...newError,
-        receiver: { ...newError.receiver, address: 'Este campo es requerido.' },
-      }
+        receiver: { ...newError.receiver, address: "Este campo es requerido." },
+      };
     } else {
       newError = {
         ...newError,
-        receiver: { ...newError.receiver, address: '' },
-      }
+        receiver: { ...newError.receiver, address: "" },
+      };
     }
     if (
       !newTransaction.receiver.tipo.length ||
-      newTransaction.receiver.tipo == ''
+      newTransaction.receiver.tipo == ""
     ) {
-      hasErrors = true
+      hasErrors = true;
       newError = {
         ...newError,
-        receiver: { ...newError.receiver, tipo: 'Este campo es requerido.' },
-      }
+        receiver: { ...newError.receiver, tipo: "Este campo es requerido." },
+      };
     } else {
       newError = {
         ...newError,
-        receiver: { ...newError.receiver, tipo: '' },
-      }
+        receiver: { ...newError.receiver, tipo: "" },
+      };
     }
     if (newTransaction.amount <= 0) {
-      hasErrors = true
+      hasErrors = true;
       newError = {
         ...newError,
-        amount: 'Este campo es requerido.',
-      }
+        amount: "Este campo es requerido.",
+      };
     } else {
       newError = {
         ...newError,
-        amount: '',
-      }
+        amount: "",
+      };
     }
-    setError(newError)
-    return hasErrors
-  }
+    setError(newError);
+    return hasErrors;
+  };
 
   const addTransaction = (e) => {
-    setLoading(true)
-    e.preventDefault()
+    setLoading(true);
+    e.preventDefault();
     if (verifyErrors()) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
-    console.log('Sending transaction')
-    let transaction = newTransaction
+    console.log("Sending transaction");
+    let transaction = newTransaction;
     transaction.sender.address =
       transaction.sender.address.substring(0, 1).toUpperCase() +
-      transaction.sender.address.substring(1).toLowerCase()
+      transaction.sender.address.substring(1).toLowerCase();
 
     transaction.receiver.address =
       transaction.receiver.address.substring(0, 1).toUpperCase() +
-      transaction.receiver.address.substring(1).toLowerCase()
-    transaction.sender.tipo = transaction.sender.tipo.toLowerCase()
-    transaction.receiver.tipo = transaction.receiver.tipo.toLowerCase()
+      transaction.receiver.address.substring(1).toLowerCase();
+    transaction.sender.tipo = transaction.sender.tipo.toLowerCase();
+    transaction.receiver.tipo = transaction.receiver.tipo.toLowerCase();
     axios
       .post(
-        'https://localhost:9000/Transactions/AddTransaction',
-        newTransaction,
+        "https://localhost:9000/Transactions/AddTransaction",
+        newTransaction
       )
       .then()
       .catch((err) => {
-        console.error(err)
+        console.error(err);
       })
       .finally(() => {
         axios
-          .get('https://localhost:9000/Blockchain')
+          .get("https://localhost:9000/Blockchain")
           .then((res) => {
-            setLibroDiario(res.data.chain)
-            setPendingTransactions(res.data.pendingTransactions)
+            setLibroDiario(res.data.chain);
+            setPendingTransactions(res.data.pendingTransactions);
           })
           .finally(() => {
-            setLoading(false)
-            calculateTotales()
-          })
-        setNewTransaction(TRANSACTION_MODEL)
-      })
-  }
+            setLoading(false);
+            calculateTotales();
+          });
+        setNewTransaction(TRANSACTION_MODEL);
+      });
+  };
   const handleSubmitTransactions = (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     axios
-      .post('https://localhost:9000/Blockchain/mine')
+      .post("https://localhost:9000/Blockchain/mine")
       .then()
       .catch()
       .finally(() => {
         axios
-          .get('https://localhost:9000/Blockchain')
+          .get("https://localhost:9000/Blockchain")
           .then((res) => {
-            setLibroDiario(res.data.chain)
-            setPendingTransactions(res.data.pendingTransactions)
+            setLibroDiario(res.data.chain);
+            setPendingTransactions(res.data.pendingTransactions);
           })
           .finally(() => {
-            setLoading(false)
-            calculateTotales()
-          })
-      })
-  }
-  useEffect(() => {}, [loading])
+            setLoading(false);
+            calculateTotales();
+          });
+      });
+  };
+  useEffect(() => {}, [loading]);
   const updateState = (e) => {
-    setLoading(true)
+    setLoading(true);
     axios
-      .get('https://localhost:9000/Blockchain')
+      .get("https://localhost:9000/Blockchain")
       .then((res) => {
-        setLibroDiario(res.data.chain)
-        setPendingTransactions(res.data.pendingTransactions)
+        setLibroDiario(res.data.chain);
+        setPendingTransactions(res.data.pendingTransactions);
       })
       .finally(() => {
-        setLoading(false)
-        calculateTotales()
-      })
-  }
+        setLoading(false);
+        calculateTotales();
+      });
+  };
   const keyDown = (e) => {
-    if (e.ctrlKey && e.key == 'r') {
-      updateState()
-    } else if (e.key === 'Enter' && e.ctrlKey) {
-      handleSubmitTransactions(e)
-    } else if (e.key === 'Enter') {
-      addTransaction(e)
+    if (e.ctrlKey && e.key == "r") {
+      updateState();
+    } else if (e.key === "Enter" && e.ctrlKey) {
+      handleSubmitTransactions(e);
+    } else if (e.key === "Enter") {
+      addTransaction(e);
     }
-  }
-  document.onkeydown = keyDown
+  };
+  const deleteBlockchain = () => {
+    setLoading(true);
+    axios
+      .delete("https://localhost:9000/Blockchain")
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((res) => {
+        console.log(res);
+      })
+      .finally(() => {
+        axios
+          .get("https://localhost:9000/Blockchain")
+          .then((res) => {
+            setLibroDiario(res.data.chain);
+            setPendingTransactions(res.data.pendingTransactions);
+          })
+          .finally(() => {
+            setLoading(false);
+            calculateTotales();
+          });
+      });
+    setNewTransaction(TRANSACTION_MODEL);
+  };
+  document.onkeydown = keyDown;
   return (
     <main>
       <header>
         <h1>Libro Diario</h1>
+        {!loading && (
+          <button
+            onClick={() => {
+              setDialogActive(!dialogActive);
+            }}
+          >
+            Delete Blockchain
+          </button>
+        )}
       </header>
       {loading ? (
         <Loader />
@@ -262,9 +297,9 @@ const LibroDiario = () => {
           Show all transactions of each block
           */}
             {libroDiario.map((block, i) => {
-              if (i == 0) return null
+              if (i == 0) return null;
               return (
-                <div className="libro-table__body__row" key={'block ' + i}>
+                <div className="libro-table__body__row" key={"block " + i}>
                   {/*Table row*/}
                   <div className="libro-table__body__row__item date">
                     {/*Table row item*/}
@@ -277,7 +312,7 @@ const LibroDiario = () => {
                     <Amount transactions={block.transactions} />
                   </div>
                 </div>
-              )
+              );
             })}
             {/*Show pending transation
              *In progress of being added to the blockchain
@@ -326,7 +361,7 @@ const LibroDiario = () => {
                       })
                     }
                   />
-                  <p style={{ color: 'red' }}>{error.sender.address}</p>
+                  <p style={{ color: "red" }}>{error.sender.address}</p>
                   <p>Tipo</p>
                   <select
                     name="tipo"
@@ -340,19 +375,13 @@ const LibroDiario = () => {
                         },
                       })
                     }
-                    defaultValue={'activo'}
+                    defaultValue={"activo"}
                   >
                     <option value="activo">Activo</option>
                     <option value="pasivo">Pasivo</option>
-                    <option value="resultado positivo">
-                      Resultado positivo
-                    </option>
-                    <option value="resultado negativo">
-                      Resultado negativo
-                    </option>
                     <option value="neto">P.Neto</option>
                   </select>
-                  <p style={{ color: 'red' }}>{error.sender.tipo}</p>
+                  <p style={{ color: "red" }}>{error.sender.tipo}</p>
                 </div>
               </div>
               <div className="libro-table__body__row__item">
@@ -370,7 +399,7 @@ const LibroDiario = () => {
                       })
                     }
                   />
-                  <p style={{ color: 'red' }}>{error.receiver.address}</p>
+                  <p style={{ color: "red" }}>{error.receiver.address}</p>
                   <p>Tipo</p>
                   <select
                     name="tipo"
@@ -384,7 +413,7 @@ const LibroDiario = () => {
                         },
                       })
                     }
-                    defaultValue={'pasivo'}
+                    defaultValue={"pasivo"}
                   >
                     <option value="activo">Activo</option>
                     <option value="pasivo">Pasivo</option>
@@ -396,7 +425,7 @@ const LibroDiario = () => {
                     </option>
                     <option value="neto">P.Neto</option>
                   </select>
-                  <p style={{ color: 'red' }}>{error.receiver.tipo}</p>
+                  <p style={{ color: "red" }}>{error.receiver.tipo}</p>
                 </div>
               </div>
               <div className="libro-table__body__row__item add">
@@ -411,7 +440,7 @@ const LibroDiario = () => {
                       })
                     }
                   />
-                  <p style={{ color: 'red' }}>{error.amount}</p>
+                  <p style={{ color: "red" }}>{error.amount}</p>
                 </div>
               </div>
             </div>
@@ -429,8 +458,19 @@ const LibroDiario = () => {
           </div>
         </div>
       )}
+      {dialogActive && (
+        <ConfirmDialog
+          cancelFunc={() => {
+            setDialogActive(false);
+          }}
+          acceptFunc={() => {
+            deleteBlockchain();
+            setDialogActive(false);
+          }}
+        ></ConfirmDialog>
+      )}
     </main>
-  )
-}
+  );
+};
 
-export default LibroDiario
+export default LibroDiario;

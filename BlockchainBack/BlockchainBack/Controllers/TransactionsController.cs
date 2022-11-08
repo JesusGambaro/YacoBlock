@@ -28,6 +28,7 @@ namespace BlockchainBack.Controllers
                 Console.WriteLine(
                     $"Transaccion: {newTransaction.Amount} desde {newTransaction.Sender.Address} a {newTransaction.Receiver.Address}.");
                 Program._blockchainServices.AddTransaction(newTransaction);
+                
                 /*if (!sender) return;
                 Program._blockchainServices(newTransaction);*/
             }

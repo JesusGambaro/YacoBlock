@@ -64,19 +64,7 @@ public class MongoDbRepository
         {
             Console.WriteLine("Blockchain is not null");
             //Get blocks by matching blockchain id and matching block id with each block in the blockchain
-            var blocks = await collection2.Find(b => b.BlockchainId == blockchain.Id).ToListAsync();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            blockchain.Chain = blocks;
-            //Get transactions by matching block id and matching transaction id with each transaction in the block
-            foreach (var block in blockchain.Chain)
-            {
-                var transactions = await collection3.Find(t => t.BlockId == block.Id).ToListAsync();
-                block.Transactions = transactions;
-            }
-
-            //get pending transactions by matching blockchain id
-            var pendingTransactions = await collection3.Find(t => t.BlockchainId == blockchain.Id).ToListAsync();
-            blockchain.PendingTransactions = pendingTransactions;
+            await UpdateBlockchain();
             //blocks.ForEach(bk => Console.WriteLine(bk.Hash));
             Console.ResetColor();
         }
@@ -178,14 +166,18 @@ public class MongoDbRepository
         await collection.UpdateOneAsync(filter, update);
     }
 
-    public async void CreateTransactionInBlockchain(Transaction transaction, Blockchain blockchain)
+    public async void CreateTransactionInBlockchain(Transaction transaction)
     {
         //Insert transaction into blockchain and update the blockchain in the database
-        transaction.BlockchainId = blockchain.Id;
+        var blockChainData = GetBlockchain();
+        blockChainData.Wait();
+        Console.WriteLine("Blockchain loaded 1 " + blockChainData.Result.Id);
+        //Console.WriteLine("Blockchain loaded 2 " + blockchain.Id);
+        transaction.BlockchainId = blockChainData.Result.Id;
         var trCollection = _user1.GetCollection<Transaction>("transaction");
         await trCollection.InsertOneAsync(transaction);
         var collection = _user1.GetCollection<Blockchain>("blockchain");
-        var filter = Builders<Blockchain>.Filter.Eq("Id", blockchain.Id);
+        var filter = Builders<Blockchain>.Filter.Eq("Id", blockChainData.Result.Id);
         var update = Builders<Blockchain>.Update.Push("PendingTransactions", transaction);
         await collection.UpdateOneAsync(filter, update);
     }
@@ -247,6 +239,12 @@ public class MongoDbRepository
         //Get the length of the chain
         var collection = _user1.GetCollection<Blockchain>("blockchain");
         var chain = collection.Find(new BsonDocument()).FirstOrDefault();
+        
+        if (chain == null)
+        {
+            Console.WriteLine("There is no blockchain");
+            return 0;
+        }
         return chain.Chain.Count;
     }
 
