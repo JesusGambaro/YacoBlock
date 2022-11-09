@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react'
-import './libroMayor.scss'
-import axios from 'axios'
-import Loader from '../Loader/Loader'
+import { useState, useEffect } from "react";
+import "./libroMayor.scss";
+import axios from "axios";
+import Loader from "../Loader/Loader";
 const LibroMayor = () => {
-  const [libroMayor, setLibroMayor] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [libroMayor, setLibroMayor] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     axios
-      .get('https://localhost:9000/Transactions/GetLibrosMayores')
+      .get("https://localhost:9000/Transactions/GetLibrosMayores")
       .then((res) => {
-        setLibroMayor(res.data)
+        setLibroMayor(res.data);
       })
       .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <main>
@@ -23,6 +23,8 @@ const LibroMayor = () => {
       </header>
       {loading ? (
         <Loader />
+      ) : !libroMayor.length ? (
+        <h1>No hay transacciones</h1>
       ) : (
         <div className="libro-mayor-container">
           {libroMayor.map((tr, i) => {
@@ -37,7 +39,7 @@ const LibroMayor = () => {
                   <div className="count-wrapper">
                     <ul className="debe-list">
                       {tr.debeList.map((d, id) => {
-                        return <li key={id}>{d}</li>
+                        return <li key={id}>{d}</li>;
                       })}
                       {tr.debeList.length > 0 && (
                         <li>
@@ -47,7 +49,7 @@ const LibroMayor = () => {
                     </ul>
                     <ul className="haber-list">
                       {tr.haberList.map((d, id) => {
-                        return <li key={id}>{d}</li>
+                        return <li key={id}>{d}</li>;
                       })}
                       {tr.haberList.length > 0 && (
                         <li>
@@ -59,18 +61,18 @@ const LibroMayor = () => {
 
                   <div className="t-footer">
                     <h2>
-                      {tr.saldo < 0 ? 'Saldo acreedor' : 'Saldo deudor'}:{' '}
+                      {tr.saldo < 0 ? "Saldo acreedor" : "Saldo deudor"}:{" "}
                       {Math.abs(tr.saldo)}
                     </h2>
                   </div>
                 </div>
               </article>
-            )
+            );
           })}
         </div>
       )}
     </main>
-  )
-}
+  );
+};
 
-export default LibroMayor
+export default LibroMayor;

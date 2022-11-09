@@ -5,6 +5,7 @@ import Transactions from "./Transactions";
 import Amount from "./Amount";
 import Loader from "../Loader/Loader";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
+import DatePicker from "../DatePicker/DatePicker";
 const TRANSACTION_MODEL = {
   sender: {
     address: "",
@@ -21,6 +22,7 @@ const LibroDiario = () => {
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dialogActive, setDialogActive] = useState(false);
+  const [dateActive, setDateActive] = useState(false);
   const [totalesLibroDiario, setTotalesLibroDiario] = useState({
     haberes: 0,
     deudores: 0,
@@ -203,11 +205,11 @@ const LibroDiario = () => {
         setNewTransaction(TRANSACTION_MODEL);
       });
   };
-  const handleSubmitTransactions = (e) => {
-    e.preventDefault();
+  const handleSubmitTransactions = (date) => {
     setLoading(true);
+    const config = { headers: {'Content-Type': 'application/json'} };
     axios
-      .post("https://localhost:9000/Blockchain/mine")
+      .post("https://localhost:9000/Blockchain/mine",date,config)
       .then()
       .catch()
       .finally(() => {
@@ -326,7 +328,10 @@ const LibroDiario = () => {
                 <div className="libro-table__body__row__item date">
                   <button
                     className="register-btn"
-                    onClick={handleSubmitTransactions}
+                    //onClick={handleSubmitTransactions}
+                    onClick={() => {
+                      setDateActive(true)
+                    } }
                   >
                     Registrar
                   </button>
@@ -461,6 +466,14 @@ const LibroDiario = () => {
             </div>
           </div>
         </div>
+      )}
+      {dateActive && (
+        <DatePicker acceptFunc={(date) => {
+          handleSubmitTransactions(date);
+          setDateActive(false);
+        }} cancelFunc={() => {
+          setDateActive(false);
+        }}></DatePicker>
       )}
       {dialogActive && (
         <ConfirmDialog

@@ -53,13 +53,13 @@ public class BlockchainServices
 
     public List<Transaction> PendingTransactions() => Blockchain.PendingTransactions;
 
-    public async Task<Block> MineBlock()
+    public async Task<Block> MineBlock(DateTime date)
     {
         // add mining reward transaction to block
         //Transaction trans = new Transaction("SYSTEM", miningRewardAddress, blockchain.MiningReward, "Mining reward");
         //blockchain.PendingTransactions.Add(trans);
         Blockchain = await _mongoDbRepository.UpdateBlockchain();
-        var block = new Block(DateTime.Now, Blockchain.PendingTransactions, LatestBlock().Hash);
+        var block = new Block( date , Blockchain.PendingTransactions, LatestBlock().Hash);
         var blockServices = new BlockServices(block);
         blockServices.MineBlock(Blockchain.Difficulty);
         await _mongoDbRepository.MineBlock(block, Blockchain);

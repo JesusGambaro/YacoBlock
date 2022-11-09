@@ -1,6 +1,6 @@
 import React from "react";
 import "./ConfirmDialog.scss"
-const ConfirmDialog = ({ cancelFunc, acceptFunc }) => {
+const ConfirmDialog = ({ cancelFunc, acceptFunc}) => {
   return (
     <section className="ConfirmDialog">
       <header>
@@ -10,10 +10,10 @@ const ConfirmDialog = ({ cancelFunc, acceptFunc }) => {
       <ul className="options-list">
         <li className="option"><button onClick={() => {
           cancelFunc()
-        }}>No</button></li>
+        }}> <p>CANCELAR</p> </button></li>
         <li className="option"><button onClick={() => {
           acceptFunc()
-        }}>Si</button></li>
+        }}> <p>CONFIRMAR</p> </button></li>
       </ul>
     </section>
   );

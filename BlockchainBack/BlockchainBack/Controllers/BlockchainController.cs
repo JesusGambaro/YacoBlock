@@ -25,15 +25,19 @@ namespace BlockchainBack.Controllers
         }
 
         [HttpPost("mine", Name = "Mine")]
-        public IActionResult Mine()
-        {
+        public IActionResult Mine([FromBody] string date)
+        {   
+            Console.WriteLine("------------------------");
+            Console.WriteLine(date);
+            Console.WriteLine("------------------------");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("");
             Console.WriteLine($"Notificacion de la API: Mine() ");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(" Minando un bloque.");
-
-            var output = Program._blockchainServices.MineBlock();
+            DateTime dateTime = DateTime.Parse(date);
+            Console.WriteLine(dateTime);
+            var output = Program._blockchainServices.MineBlock(dateTime);
             output.Wait();
 
 
